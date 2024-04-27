@@ -1,50 +1,45 @@
-"""Implementação de autômatos finitos."""
-
+from collections import defaultdict
 
 def load_automata(filename):
-    """
-    Lê os dados de um autômato finito a partir de um arquivo.
+    try:
+        with open(filename, 'r') as file:
+            lines = [line.strip() for line in file.readlines()]
 
-    A estsrutura do arquivo deve ser:
+        Sigma = set(lines[0].split())
+        Q = lines[1].split()
+        F = lines[2].split()
+        q0 = lines[3].strip()
+        transitions = lines[4:]
 
-    <lista de símbolos do alfabeto, separados por espaço (' ')>
-    <lista de nomes de estados>
-    <lista de nomes de estados finais>
-    <nome do estado inicial>
-    <lista de regras de transição, com "origem símbolo destino">
+        delta = defaultdict(dict)
+        for transition in transitions:
+            state_from, symbol, state_to = transition.split()
+            if symbol in delta[state_from]:
+                raise Exception("Transição não determinística encontrada")
+            delta[state_from][symbol] = state_to
 
-    Um exemplo de arquivo válido é:
-
-    ```
-    a b
-    q0 q1 q2 q3
-    q0 q3
-    q0
-    q0 a q1
-    q0 b q2
-    q1 a q0
-    q1 b q3
-    q2 a q3
-    q2 b q0
-    q3 a q1
-    q3 b q2
-    ```
-
-    Caso o arquivo seja inválido uma exceção Exception é gerada.
-
-    """
-
-    with open(filename, "rt") as arquivo:
-        # processa arquivo...
-        pass
-
+        return Q, Sigma, delta, q0, set(F)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Arquivo {filename} Não foi encontrado")
+    except Exception as e:
+        raise Exception(f"Erro ao converte arquivo: {str(e)}")
 
 def process(automata, words):
-    """
-    Processa a lista de palavras e retora o resultado.
-    
-    Os resultados válidos são ACEITA, REJEITA, INVALIDA.
-    """
+    Q, Sigma, delta, q0, F = automata
+    results = {}
 
     for word in words:
-        # tenta reconhecer `word`
+        current_state = q0
+        for char in word:
+            if char not in Sigma:
+                results[word] = "INVÁLIDA"
+                break
+            try:
+                current_state = delta[current_state][char]
+            except KeyError:
+                results[word] = "REJEITA"
+                break
+        else:
+            results[word] = "ACEITA" if current_state in F else "REJEITA"
+    
+    return results
