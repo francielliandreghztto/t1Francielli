@@ -33,7 +33,6 @@ def load_automata(filename: str):
     Caso o arquivo seja inválido uma exceção Exception é gerada.
 
     """
-
     with open(filename, "rt", encoding="utf-8") as file:
         lines = file.readlines()
         sigma = lines[0].strip().split()
@@ -62,13 +61,11 @@ def load_automata(filename: str):
 
 
 def process(automaton, words):
-
     """
     Processa a lista de palavras e retora o resultado.
     
     Os resultados válidos são ACEITA, REJEITA, INVALIDA.
     """
-
     states, sigma, delta, initial_state, final_states = automaton
     result = {}
 
