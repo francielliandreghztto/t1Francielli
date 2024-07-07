@@ -63,7 +63,7 @@ def load_automata(filename: str):
 def process(automaton, words):
     """
     Processa a lista de palavras e retora o resultado.
-    
+
     Os resultados válidos são ACEITA, REJEITA, INVALIDA.
     """
     states, sigma, delta, initial_state, final_states = automaton
